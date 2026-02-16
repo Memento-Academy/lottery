@@ -45,8 +45,8 @@ export function Header() {
             height={32}
             className="h-8 w-8 object-contain"
           />
-          <span className="text-lg font-bold tracking-tight text-white hidden sm:inline-block">
-            Weekend Lottery
+          <span className="text-xl font-extrabold tracking-tight text-white">
+            Weekend <span className="text-cyan-400">Lottery</span>
           </span>
         </Link>
 

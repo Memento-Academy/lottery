@@ -2,10 +2,9 @@
 pragma solidity ^0.8.19;
 
 interface AutomationCompatibleInterface {
-    function checkUpkeep(bytes calldata checkData)
-        external
-        view
-        returns (bool upkeepNeeded, bytes memory performData);
+    function checkUpkeep(
+        bytes calldata checkData
+    ) external view returns (bool upkeepNeeded, bytes memory performData);
 
     function performUpkeep(bytes calldata performData) external;
 }
@@ -21,7 +20,11 @@ contract WeekendLottery is AutomationCompatibleInterface {
     bool public lotteryActive;
 
     event LotteryEntered(address indexed player, uint256 lotteryId);
-    event LotteryWinnerPicked(address indexed winner, uint256 prize, uint256 lotteryId);
+    event LotteryWinnerPicked(
+        address indexed winner,
+        uint256 prize,
+        uint256 lotteryId
+    );
     event LotteryStarted(uint256 endTime, uint256 lotteryId);
 
     constructor() {
@@ -38,14 +41,20 @@ contract WeekendLottery is AutomationCompatibleInterface {
 
     modifier onlyWhileOpen() {
         require(lotteryActive, "Lottery is currently closed");
-        require(block.timestamp < lotteryEndTimestamp, "Lottery time has ended");
+        require(
+            block.timestamp < lotteryEndTimestamp,
+            "Lottery time has ended"
+        );
         _;
     }
 
     // 1. Enter Lottery (Free or Paid? User wants Free for now, but contract can handle value)
     function enterLottery() public payable onlyWhileOpen {
         // Enforce 1 ticket per person logic
-        require(!roundEntries[lotteryId][msg.sender], "One ticket per person limit");
+        require(
+            !roundEntries[lotteryId][msg.sender],
+            "One ticket per person limit"
+        );
 
         // Optional: Require payment if we want paid lottery later
         // require(msg.value >= ticketPrice, "Insufficient funds");
@@ -71,21 +80,25 @@ contract WeekendLottery is AutomationCompatibleInterface {
     }
 
     // 3. Chainlink Automation: Check
-    function checkUpkeep(bytes calldata /* checkData */ )
+    function checkUpkeep(
+        bytes calldata /* checkData */
+    )
         external
         view
         override
-        returns (bool upkeepNeeded, bytes memory /* performData */ )
+        returns (bool upkeepNeeded, bytes memory /* performData */)
     {
         // Trigger if:
         // 1. Lottery IS active
         // 2. Time has passed (now > endTime)
         // 3. There are players (optional, but good to save gas if empty)
-        upkeepNeeded = (lotteryActive && block.timestamp >= lotteryEndTimestamp && players.length > 0);
+        upkeepNeeded = (lotteryActive &&
+            block.timestamp >= lotteryEndTimestamp &&
+            players.length > 0);
     }
 
     // 4. Chainlink Automation: Perform (Pick Winner)
-    function performUpkeep(bytes calldata /* performData */ ) external override {
+    function performUpkeep(bytes calldata /* performData */) external override {
         // Re-validate state
         require(lotteryActive, "Lottery not active");
         require(block.timestamp >= lotteryEndTimestamp, "Time not yet reached");
@@ -96,13 +109,20 @@ contract WeekendLottery is AutomationCompatibleInterface {
 
     // Internal logic to pick winner
     function pickWinner() internal {
-        uint256 randomIndex =
-            uint256(keccak256(abi.encodePacked(block.prevrandao, block.timestamp, players.length))) % players.length;
+        uint256 randomIndex = uint256(
+            keccak256(
+                abi.encodePacked(
+                    block.prevrandao,
+                    block.timestamp,
+                    players.length
+                )
+            )
+        ) % players.length;
         address payable winner = players[randomIndex];
         uint256 prize = address(this).balance;
 
         // Transfer all funds to winner
-        (bool success,) = winner.call{value: prize}("");
+        (bool success, ) = winner.call{value: prize}("");
         require(success, "Transfer failed"); // Should we handle failure gracefully? For MVP revert is safer.
 
         emit LotteryWinnerPicked(winner, prize, lotteryId);

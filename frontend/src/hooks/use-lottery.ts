@@ -86,8 +86,19 @@ export function useLottery() {
         setIsLotteryActive(results[2].result as boolean);
 
       if (results[3].status === "success") {
-        setOwner(results[3].result as Address);
+        const ownerAddr = results[3].result as Address;
+        setOwner(ownerAddr);
+        // console.log("Contract Owner:", ownerAddr);
       }
+
+      // Log for debugging (remove in production)
+      /*
+      console.log({
+        owner: results[3].status === "success" ? results[3].result : "fail",
+        user: user?.wallet?.address,
+        match: (user?.wallet?.address?.toLowerCase() === (results[3].result as string)?.toLowerCase())
+      });
+      */
 
       if (results[4].status === "success")
         setPlayers(results[4].result as Address[]);
@@ -205,6 +216,23 @@ export function useLottery() {
   const [smartAccountAddress, setSmartAccountAddress] =
     useState<Address | null>(null);
 
+  // Check if current user is owner (case-insensitive)
+  const isOwner =
+    !!user?.wallet?.address &&
+    !!owner &&
+    user.wallet.address.toLowerCase() === owner.toLowerCase();
+
+  // Debug log for owner detection
+  useEffect(() => {
+    if (user?.wallet?.address && owner) {
+      console.log("Lottery Owner Check:", {
+        connected: user.wallet.address,
+        contractOwner: owner,
+        isMatch: isOwner,
+      });
+    }
+  }, [user, owner, isOwner]);
+
   // Fetch Smart Account Address
   useEffect(() => {
     let mounted = true;
@@ -247,6 +275,7 @@ export function useLottery() {
     playersCount,
     totalPrize,
     isLotteryActive,
+    isOwner, // Return boolean directly
     owner,
     players,
     timeRemaining,

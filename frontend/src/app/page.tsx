@@ -6,11 +6,7 @@ import { useLottery } from "@/hooks/use-lottery";
 import { Clock, Timer } from "lucide-react";
 
 export default function Home() {
-  const { owner, players, userAddress, timeRemaining } = useLottery();
-
-  // Check if current user is owner (case-insensitive)
-  const isOwner =
-    userAddress && owner && userAddress.toLowerCase() === owner.toLowerCase();
+  const { players, timeRemaining, isOwner } = useLottery();
 
   const formatDuration = (seconds: bigint) => {
     const s = Number(seconds);
