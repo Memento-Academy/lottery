@@ -21,7 +21,7 @@ export function Footer() {
               FAQ
             </Link>
             <a
-              href="https://sepolia.etherscan.io"
+              href="https://sepolia.etherscan.io/address/0x96763E51756E02ED907E15648c7E70a9bED8696F"
               target="_blank"
               rel="noopener noreferrer"
               className="hover:text-cyan-400 transition-colors flex items-center gap-1"
@@ -30,7 +30,7 @@ export function Footer() {
               <ExternalLink className="h-3 w-3" />
             </a>
             <a
-              href="https://github.com/CallejaJ/lottery-with-foundry"
+              href="https://github.com/CallejaJ/weekend-lottery"
               target="_blank"
               rel="noopener noreferrer"
               className="hover:text-cyan-400 transition-colors flex items-center gap-1"
