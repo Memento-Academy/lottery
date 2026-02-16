@@ -8,7 +8,7 @@ import { Footer } from "@/components/footer";
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "Lottery | Built with Foundry",
+  title: "Weekend Lottery | Gasless On-Chain Game",
   description:
     "A fair, transparent on-chain lottery built with Foundry and Next.js",
   icons: {

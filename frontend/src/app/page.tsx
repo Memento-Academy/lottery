@@ -38,8 +38,7 @@ export default function Home() {
         )}
 
         <h1 className="text-4xl md:text-6xl font-extrabold tracking-tight text-white">
-          Win Big on the <span className="text-cyan-400">Sepolia</span> Weekend
-          Lottery
+          Win Big on the <span className="text-cyan-400">Weekend</span> Lottery
         </h1>
         <p className="text-lg text-slate-400">
           A transparent, decentralized lottery built for the weekend.

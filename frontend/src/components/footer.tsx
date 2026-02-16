@@ -8,7 +8,7 @@ export function Footer() {
         <div className="flex flex-col md:flex-row items-center justify-between gap-8 text-sm text-slate-400">
           <div className="flex flex-col items-center md:items-start gap-2">
             <span className="font-bold text-white text-lg tracking-tight">
-              Sepolia Lottery
+              Weekend Lottery
             </span>
             <span className="text-slate-500 italic">
               © {new Date().getFullYear()} All rights reserved. Built for the

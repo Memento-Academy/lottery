@@ -46,7 +46,7 @@ export function Header() {
             className="h-8 w-8 object-contain"
           />
           <span className="text-lg font-bold tracking-tight text-white hidden sm:inline-block">
-            Sepolia Lottery
+            Weekend Lottery
           </span>
         </Link>
 
