@@ -10,6 +10,7 @@
   },
   "dependencies": {
     "@privy-io/react-auth": "^1.99.1",
+    "@radix-ui/react-accordion": "^1.2.12",
     "@radix-ui/react-slot": "^1.2.4",
     "@zerodev/ecdsa-validator": "^5.4.9",
     "@zerodev/sdk": "^5.5.7",
