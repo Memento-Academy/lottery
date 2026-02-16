@@ -47,10 +47,7 @@ contract Lottery {
      */
     function enterLottery() external payable lotteryIsActive {
         require(msg.value == ticketPrice, "Incorrect ticket price");
-        require(
-            !roundEntries[lotteryId][msg.sender],
-            "One ticket per person limit"
-        );
+        require(!roundEntries[lotteryId][msg.sender], "One ticket per person limit");
 
         roundEntries[lotteryId][msg.sender] = true;
         players.push(payable(msg.sender));
@@ -62,17 +59,7 @@ contract Lottery {
      * En producción se debería usar Chainlink VRF u otro oracle
      */
     function generateRandomNumber() private view returns (uint256) {
-        return
-            uint256(
-                keccak256(
-                    abi.encodePacked(
-                        block.timestamp,
-                        block.difficulty,
-                        players.length,
-                        msg.sender
-                    )
-                )
-            );
+        return uint256(keccak256(abi.encodePacked(block.timestamp, block.difficulty, players.length, msg.sender)));
     }
 
     /**
