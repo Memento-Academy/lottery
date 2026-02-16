@@ -230,31 +230,16 @@ export function useLottery() {
     !!owner &&
     user.wallet.address.toLowerCase() === owner.toLowerCase();
 
-  // Force Log for Debugging
-  useEffect(() => {
-    console.log("DEBUG: useLottery Hook Running", {
-      hasAddress: !!LOTTERY_ADDRESS,
-      addressValue: LOTTERY_ADDRESS,
-      authenticated: !!user,
-      wallet: user?.wallet?.address,
-    });
-  }, [user]);
-
   // Debug log for owner detection
   useEffect(() => {
-    if (!LOTTERY_ADDRESS) {
-      console.warn("DEBUG: LOTTERY_ADDRESS is missing!");
-      return;
-    }
+    if (!LOTTERY_ADDRESS || !owner) return;
 
-    console.log("Lottery Summary:", {
-      active: isLotteryActive,
+    console.log("Lottery Owner Match:", {
+      isMatch: isOwner,
       owner: owner,
       user: user?.wallet?.address,
-      match: isOwner,
-      contractAddr: LOTTERY_ADDRESS,
     });
-  }, [user, owner, isOwner, isLotteryActive]);
+  }, [user, owner, isOwner]);
 
   // Fetch Smart Account Address
   useEffect(() => {
