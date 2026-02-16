@@ -14,7 +14,7 @@
 
 ---
 
-## 🚀 How It Works
+## How It Works
 
 The Sepolia Weekend Lottery is designed for maximum accessibility and transparency. It leverages **Account Abstraction** to provide a seamless "gasless" experience for users.
 
@@ -29,7 +29,7 @@ Deploy (set ticket price)
                           └─► Prize transferred automatically
 ```
 
-### ⛽ Gasless Entries (Account Abstraction)
+### Gasless Entries (Account Abstraction)
 
 We use **ZeroDev (Kernel)** and **Privy** to simplify the Web3 onboarding experience:
 
@@ -39,7 +39,7 @@ We use **ZeroDev (Kernel)** and **Privy** to simplify the Web3 onboarding experi
 
 ---
 
-## 🏗️ System Architecture
+## System Architecture
 
 ```mermaid
 graph TD
@@ -62,7 +62,7 @@ graph TD
 
 ---
 
-## 🛠️ Technology Stack
+## Technology Stack
 
 ### Smart Contracts
 
@@ -80,17 +80,17 @@ graph TD
 
 ---
 
-## ✨ Features
+## Features
 
-- **📱 Premium Responsive UI**: A dark, high-end aesthetic inspired by modern Web3 apps.
-- **🔗 Linear Header**: Sleek, horizontal navigation with quick-copy Smart Account link.
-- **❓ Interactive FAQ**: Explaining pricing models and gas sponsorship in detail.
-- **🏦 Automated Cycles**: The contract is designed for 72h automated lottery rounds.
-- **🛡️ Security First**: Fuzz testing, access controls, and reentrancy protection.
+- **Premium Responsive UI**: A dark, high-end aesthetic inspired by modern Web3 apps.
+- **Linear Header**: Sleek, horizontal navigation with quick-copy Smart Account link.
+- **Interactive FAQ**: Explaining pricing models and gas sponsorship in detail.
+- **Automated Cycles**: The contract is designed for 72h automated lottery rounds.
+- **Security First**: Fuzz testing, access controls, and reentrancy protection.
 
 ---
 
-## 🧪 Testing Strategy
+## Testing Strategy
 
 The project includes a comprehensive test suite using Forge.
 
@@ -108,7 +108,7 @@ forge test -vvv
 
 ---
 
-## 🏁 Getting Started
+## Getting Started
 
 ### Smart Contract Setup
 
@@ -143,4 +143,4 @@ npm run dev
 
 ---
 
-Built with ❤️ for the Web3 Community.
+Built for the Web3 Community.
