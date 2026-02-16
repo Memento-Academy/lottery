@@ -232,14 +232,16 @@ export function useLottery() {
 
   // Debug log for owner detection
   useEffect(() => {
-    console.log("Lottery Component State:", {
-      isOwner,
-      ownerAddress: owner,
-      userWallet: user?.wallet?.address,
-      authenticated,
-      lotteryActive: isLotteryActive,
+    if (!LOTTERY_ADDRESS) return;
+
+    console.log("Lottery Summary:", {
+      active: isLotteryActive,
+      owner: owner,
+      user: user?.wallet?.address,
+      match: isOwner,
+      contractAddr: LOTTERY_ADDRESS,
     });
-  }, [user, owner, isOwner, authenticated, isLotteryActive]);
+  }, [user, owner, isOwner, isLotteryActive]);
 
   // Fetch Smart Account Address
   useEffect(() => {
