@@ -18,7 +18,7 @@ const publicClient = createPublicClient({
 });
 
 export function useLottery() {
-  const { user } = usePrivy();
+  const { user, authenticated } = usePrivy();
   const { wallets } = useWallets();
 
   // Contract State
