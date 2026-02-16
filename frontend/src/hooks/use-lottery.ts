@@ -76,7 +76,14 @@ export function useLottery() {
         ],
       });
 
-      // console.log("Multicall Raw Results:", results);
+      console.log(
+        "Multicall Results:",
+        results.map((r, i) => ({
+          index: i,
+          status: r.status,
+          error: r.status === "failure" ? r.error : null,
+        })),
+      );
 
       if (results[0].status === "success")
         setPlayersCount(Number(results[0].result));
@@ -88,7 +95,8 @@ export function useLottery() {
       if (results[3].status === "success") {
         const ownerAddr = results[3].result as Address;
         setOwner(ownerAddr);
-        // console.log("Contract Owner:", ownerAddr);
+      } else {
+        console.warn("Owner fetch failed:", results[3].error);
       }
 
       // Log for debugging (remove in production)
