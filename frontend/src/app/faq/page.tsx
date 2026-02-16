@@ -104,13 +104,13 @@ export default function FAQPage() {
             </AccordionTrigger>
             <AccordionContent className="text-slate-400 leading-relaxed">
               <p>
-                <strong>You don't have to!</strong>
+                <strong>You don&apos;t have to!</strong>
               </p>
               <p className="mt-2">
-                Unlike other platforms that require a manual "Claim" transaction
-                (and more gas), our contract{" "}
+                Unlike other platforms that require a manual &quot;Claim&quot;
+                transaction (and more gas), our contract{" "}
                 <strong>automatically transfers</strong> the prize directly to
-                the winner's wallet the moment the draw is completed.
+                the winner&apos;s wallet the moment the draw is completed.
               </p>
             </AccordionContent>
           </AccordionItem>
