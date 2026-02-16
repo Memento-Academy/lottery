@@ -82,15 +82,41 @@ export default function FAQPage() {
               <span>When are winners selected?</span>
             </AccordionTrigger>
             <AccordionContent className="text-slate-400 leading-relaxed">
-              The lottery is designed to run automatically every weekend. Once
-              the round closes, the smart contract selects a winner from the
-              pool of participants, and the prize is ready to be claimed shortly
-              after.
+              <p>
+                The lottery is designed to run{" "}
+                <strong>fully automatically</strong>.
+              </p>
+              <p className="mt-2">
+                We use <span className="text-white">Chainlink Automation</span>{" "}
+                to trigger the draw every 72 hours (by default during weekends).
+                The smart contract independently selects a winner without any
+                manual intervention.
+              </p>
             </AccordionContent>
           </AccordionItem>
 
           <AccordionItem
             value="item-5"
+            className="border border-white/10 rounded-lg bg-slate-900/50 px-4"
+          >
+            <AccordionTrigger className="text-white hover:text-cyan-400 hover:no-underline">
+              <span>How do I claim my prize?</span>
+            </AccordionTrigger>
+            <AccordionContent className="text-slate-400 leading-relaxed">
+              <p>
+                <strong>You don't have to!</strong>
+              </p>
+              <p className="mt-2">
+                Unlike other platforms that require a manual "Claim" transaction
+                (and more gas), our contract{" "}
+                <strong>automatically transfers</strong> the prize directly to
+                the winner's wallet the moment the draw is completed.
+              </p>
+            </AccordionContent>
+          </AccordionItem>
+
+          <AccordionItem
+            value="item-6"
             className="border border-white/10 rounded-lg bg-slate-900/50 px-4"
           >
             <AccordionTrigger className="text-white hover:text-cyan-400 hover:no-underline">
