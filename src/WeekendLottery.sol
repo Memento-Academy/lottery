@@ -86,7 +86,7 @@ contract WeekendLottery is AutomationCompatibleInterface {
         external
         view
         override
-        returns (bool upkeepNeeded, bytes memory /* performData */)
+        returns (bool upkeepNeeded, bytes memory performData)
     {
         // Trigger if:
         // 1. Lottery IS active
@@ -95,6 +95,7 @@ contract WeekendLottery is AutomationCompatibleInterface {
         upkeepNeeded = (lotteryActive &&
             block.timestamp >= lotteryEndTimestamp &&
             players.length > 0);
+        return (upkeepNeeded, "");
     }
 
     // 4. Chainlink Automation: Perform (Pick Winner)
