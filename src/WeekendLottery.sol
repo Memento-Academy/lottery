@@ -86,7 +86,7 @@ contract WeekendLottery is AutomationCompatibleInterface {
         external
         view
         override
-        returns (bool upkeepNeeded, bytes memory performData)
+        returns (bool upkeepNeeded, bytes memory /* performData */)
     {
         // Trigger if:
         // 1. Lottery IS active
