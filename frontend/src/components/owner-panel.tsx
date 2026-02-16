@@ -14,13 +14,13 @@ export function OwnerPanel() {
   const {
     isLotteryActive,
     playersCount,
-    pickWinner,
-    startNewLottery,
+    startWeekendLottery,
     isLoading,
     totalPrize,
   } = useLottery();
 
-  const [newPrice, setNewPrice] = useState("0.01");
+  // Default to 3 days (in seconds, but input is days for UX)
+  const [durationDays, setDurationDays] = useState("3");
 
   return (
     <Card className="border-cyan-500/20 bg-cyan-950/10">
@@ -39,41 +39,35 @@ export function OwnerPanel() {
               <p className="text-sm text-slate-400">Players: {playersCount}</p>
             </div>
 
-            <Button
-              onClick={pickWinner}
-              disabled={isLoading || playersCount === 0}
-              className="w-full bg-cyan-600 hover:bg-cyan-500"
-            >
-              {isLoading ? (
-                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-              ) : (
-                <Trophy className="mr-2 h-4 w-4" />
-              )}
-              Pick Winner
-            </Button>
-            {playersCount === 0 && (
-              <p className="text-xs text-center text-slate-500">
-                Need at least 1 player
-              </p>
-            )}
+            <p className="text-xs text-center text-slate-500 animate-pulse">
+              Lottery is active. Will auto-close when timer ends.
+            </p>
           </div>
         ) : (
           <div className="flex flex-col gap-4">
             <div className="space-y-2">
               <label className="text-sm font-medium text-slate-300">
-                New Ticket Price (ETH)
+                Duration (Days)
               </label>
               <input
                 type="number"
-                step="0.001"
-                value={newPrice}
-                onChange={(e) => setNewPrice(e.target.value)}
-                className="flex h-10 w-full rounded-md border border-white/10 bg-slate-900 px-3 py-2 text-sm text-white placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-cyan-500/50"
+                min="1"
+                step="1"
+                value={durationDays}
+                onChange={(e) => {
+                  const val = parseFloat(e.target.value);
+                  if (val >= 1 || e.target.value === "")
+                    setDurationDays(e.target.value);
+                }}
+                className="flex h-10 w-full rounded-md border border-white/10 bg-slate-900 px-3 py-2 text-sm text-white placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-cyan-500/50 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
               />
             </div>
 
             <Button
-              onClick={() => startNewLottery(newPrice)}
+              onClick={() => {
+                const seconds = parseFloat(durationDays) * 24 * 60 * 60;
+                startWeekendLottery(seconds);
+              }}
               disabled={isLoading}
               className="w-full"
             >
@@ -82,7 +76,7 @@ export function OwnerPanel() {
               ) : (
                 <RefreshCw className="mr-2 h-4 w-4" />
               )}
-              Start New Lottery
+              Start Weekend Lottery
             </Button>
           </div>
         )}

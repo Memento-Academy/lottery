@@ -14,7 +14,7 @@ import { createGaslessAccount } from "@/lib/zerodev";
 
 const publicClient = createPublicClient({
   chain: sepolia,
-  transport: http(),
+  transport: http("https://ethereum-sepolia.publicnode.com"), // Ankr was failing, trying PublicNode
 });
 
 export function useLottery() {
@@ -22,13 +22,13 @@ export function useLottery() {
   const { wallets } = useWallets();
 
   // Contract State
-  const [ticketPrice, setTicketPrice] = useState<string>("0");
-  const [targetPrice, setTargetPrice] = useState<bigint>(0n);
   const [playersCount, setPlayersCount] = useState<number>(0);
   const [totalPrize, setTotalPrize] = useState<string>("0");
   const [isLotteryActive, setIsLotteryActive] = useState<boolean>(false);
   const [owner, setOwner] = useState<Address | null>(null);
   const [players, setPlayers] = useState<Address[]>([]);
+  const [timeRemaining, setTimeRemaining] = useState<bigint>(0n);
+  const [endTimestamp, setEndTimestamp] = useState<bigint>(0n);
 
   // UI State
   const [isLoading, setIsLoading] = useState(false);
@@ -40,47 +40,63 @@ export function useLottery() {
     if (!LOTTERY_ADDRESS) return;
 
     try {
-      const [price, count, prize, active, ownerAddr, playersList] =
-        await Promise.all([
-          publicClient.readContract({
-            address: LOTTERY_ADDRESS,
-            abi: LOTTERY_ABI,
-            functionName: "ticketPrice",
-          }),
-          publicClient.readContract({
+      const results = await publicClient.multicall({
+        contracts: [
+          {
             address: LOTTERY_ADDRESS,
             abi: LOTTERY_ABI,
             functionName: "getPlayersCount",
-          }),
-          publicClient.readContract({
+          },
+          {
             address: LOTTERY_ADDRESS,
             abi: LOTTERY_ABI,
             functionName: "getTotalPrize",
-          }),
-          publicClient.readContract({
+          },
+          {
             address: LOTTERY_ADDRESS,
             abi: LOTTERY_ABI,
             functionName: "lotteryActive",
-          }),
-          publicClient.readContract({
-            address: LOTTERY_ADDRESS,
-            abi: LOTTERY_ABI,
-            functionName: "owner",
-          }),
-          publicClient.readContract({
+          },
+          { address: LOTTERY_ADDRESS, abi: LOTTERY_ABI, functionName: "owner" },
+          {
             address: LOTTERY_ADDRESS,
             abi: LOTTERY_ABI,
             functionName: "getPlayers",
-          }),
-        ]);
+          },
+          {
+            address: LOTTERY_ADDRESS,
+            abi: LOTTERY_ABI,
+            functionName: "getTimeRemaining",
+          },
+          {
+            address: LOTTERY_ADDRESS,
+            abi: LOTTERY_ABI,
+            functionName: "lotteryEndTimestamp",
+          },
+        ],
+      });
 
-      setTargetPrice(price as bigint);
-      setTicketPrice(formatEther(price as bigint));
-      setPlayersCount(Number(count));
-      setTotalPrize(formatEther(prize as bigint));
-      setIsLotteryActive(active as boolean);
-      setOwner(ownerAddr as Address);
-      setPlayers(playersList as Address[]);
+      // console.log("Multicall Raw Results:", results);
+
+      if (results[0].status === "success")
+        setPlayersCount(Number(results[0].result));
+      if (results[1].status === "success")
+        setTotalPrize(formatEther(results[1].result as bigint));
+      if (results[2].status === "success")
+        setIsLotteryActive(results[2].result as boolean);
+
+      if (results[3].status === "success") {
+        setOwner(results[3].result as Address);
+      }
+
+      if (results[4].status === "success")
+        setPlayers(results[4].result as Address[]);
+
+      if (results[5].status === "success")
+        setTimeRemaining(results[5].result as bigint);
+
+      if (results[6].status === "success")
+        setEndTimestamp(results[6].result as bigint);
     } catch (err) {
       console.error("Error fetching contract data:", err);
     }
@@ -132,7 +148,7 @@ export function useLottery() {
         address: LOTTERY_ADDRESS,
         abi: LOTTERY_ABI,
         functionName: "enterLottery",
-        value: targetPrice, // Send exact ticket price
+        value: 0n, // FREE ENTRY
       });
 
       console.log("Tx Sent:", hash);
@@ -141,15 +157,16 @@ export function useLottery() {
       // Wait for confirmation
       await publicClient.waitForTransactionReceipt({ hash });
       await fetchContractData(); // Refresh UI
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error("Enter Lottery Error:", err);
-      setError(err.message || "Transaction failed");
+      const message = err instanceof Error ? err.message : "Transaction failed";
+      setError(message);
     } finally {
       setIsLoading(false);
     }
   };
 
-  const pickWinner = async () => {
+  const startWeekendLottery = async (durationSeconds: number = 259200) => {
     setIsLoading(true);
     setError(null);
     try {
@@ -165,78 +182,83 @@ export function useLottery() {
         }),
       );
 
-      const kernelClient = await createGaslessAccount(walletClient);
-
-      const hash = await kernelClient.writeContract({
+      // Using walletClient directly (EOA)
+      const hash = await walletClient.writeContract({
         address: LOTTERY_ADDRESS,
         abi: LOTTERY_ABI,
-        functionName: "pickWinner",
+        functionName: "startWeekendLottery",
+        args: [BigInt(durationSeconds)],
       });
 
       setTxHash(hash);
       await publicClient.waitForTransactionReceipt({ hash });
       await fetchContractData();
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error(err);
-      setError(err.message);
+      const message = err instanceof Error ? err.message : "Unknown error";
+      setError(message);
     } finally {
       setIsLoading(false);
     }
   };
 
-  const startNewLottery = async (priceEth: string) => {
-    setIsLoading(true);
-    setError(null);
-    try {
-      const wallet = await getWallet();
-      if (!wallet) throw new Error("No wallet connected");
+  const [smartAccountAddress, setSmartAccountAddress] =
+    useState<Address | null>(null);
 
-      const provider = await wallet.getEthereumProvider();
-      const walletClient = await import("viem").then((m) =>
-        m.createWalletClient({
-          account: wallet.address as Address,
-          chain: sepolia,
-          transport: m.custom(provider),
-        }),
-      );
+  // Fetch Smart Account Address
+  useEffect(() => {
+    let mounted = true;
 
-      const kernelClient = await createGaslessAccount(walletClient);
+    if (!user || wallets.length === 0) return;
 
-      const params = parseEther(priceEth);
-      const hash = await kernelClient.writeContract({
-        address: LOTTERY_ADDRESS,
-        abi: LOTTERY_ABI,
-        functionName: "startNewLottery",
-        args: [params],
-      });
+    const fetchAccount = async () => {
+      try {
+        const wallet = await getWallet();
+        if (!wallet) return;
 
-      setTxHash(hash);
-      await publicClient.waitForTransactionReceipt({ hash });
-      await fetchContractData();
-    } catch (err: any) {
-      console.error(err);
-      setError(err.message);
-    } finally {
-      setIsLoading(false);
-    }
-  };
+        const provider = await wallet.getEthereumProvider();
+        const walletClient = await import("viem").then((m) =>
+          m.createWalletClient({
+            account: wallet.address as Address,
+            chain: sepolia,
+            transport: m.custom(provider),
+          }),
+        );
+
+        const kernelClient = await createGaslessAccount(walletClient);
+        if (mounted) {
+          setSmartAccountAddress(kernelClient.account.address);
+          console.log("Smart Account Loaded:", kernelClient.account.address);
+        }
+      } catch (e) {
+        console.error("Failed to fetch smart account", e);
+      }
+    };
+
+    fetchAccount();
+
+    return () => {
+      mounted = false;
+    };
+  }, [wallets, user, getWallet]);
 
   return {
     // State
-    ticketPrice,
     playersCount,
     totalPrize,
     isLotteryActive,
     owner,
     players,
+    timeRemaining,
+    endTimestamp,
     isLoading,
     txHash,
     error,
     userAddress: user?.wallet?.address,
+    smartAccountAddress,
     // Actions
     enterLottery,
-    pickWinner,
-    startNewLottery,
+    startWeekendLottery,
     refresh: fetchContractData,
   };
 }

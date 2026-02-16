@@ -6,14 +6,36 @@ export const LOTTERY_ADDRESS = (process.env.NEXT_PUBLIC_LOTTERY_ADDRESS ||
 export const LOTTERY_ABI = [
   {
     type: "constructor",
+    inputs: [],
+    stateMutability: "nonpayable",
+  },
+  {
+    type: "receive",
+    stateMutability: "payable",
+  },
+  {
+    type: "function",
+    name: "checkUpkeep",
     inputs: [
       {
-        name: "_ticketPrice",
-        type: "uint256",
-        internalType: "uint256",
+        name: "",
+        type: "bytes",
+        internalType: "bytes",
       },
     ],
-    stateMutability: "nonpayable",
+    outputs: [
+      {
+        name: "upkeepNeeded",
+        type: "bool",
+        internalType: "bool",
+      },
+      {
+        name: "",
+        type: "bytes",
+        internalType: "bytes",
+      },
+    ],
+    stateMutability: "view",
   },
   {
     type: "function",
@@ -38,6 +60,19 @@ export const LOTTERY_ABI = [
   {
     type: "function",
     name: "getPlayersCount",
+    inputs: [],
+    outputs: [
+      {
+        name: "",
+        type: "uint256",
+        internalType: "uint256",
+      },
+    ],
+    stateMutability: "view",
+  },
+  {
+    type: "function",
+    name: "getTimeRemaining",
     inputs: [],
     outputs: [
       {
@@ -76,6 +111,32 @@ export const LOTTERY_ABI = [
   },
   {
     type: "function",
+    name: "lotteryEndTimestamp",
+    inputs: [],
+    outputs: [
+      {
+        name: "",
+        type: "uint256",
+        internalType: "uint256",
+      },
+    ],
+    stateMutability: "view",
+  },
+  {
+    type: "function",
+    name: "lotteryId",
+    inputs: [],
+    outputs: [
+      {
+        name: "",
+        type: "uint256",
+        internalType: "uint256",
+      },
+    ],
+    stateMutability: "view",
+  },
+  {
+    type: "function",
     name: "owner",
     inputs: [],
     outputs: [
@@ -89,8 +150,14 @@ export const LOTTERY_ABI = [
   },
   {
     type: "function",
-    name: "pickWinner",
-    inputs: [],
+    name: "performUpkeep",
+    inputs: [
+      {
+        name: "",
+        type: "bytes",
+        internalType: "bytes",
+      },
+    ],
     outputs: [],
     stateMutability: "nonpayable",
   },
@@ -115,10 +182,34 @@ export const LOTTERY_ABI = [
   },
   {
     type: "function",
-    name: "startNewLottery",
+    name: "roundEntries",
     inputs: [
       {
-        name: "_newTicketPrice",
+        name: "",
+        type: "uint256",
+        internalType: "uint256",
+      },
+      {
+        name: "",
+        type: "address",
+        internalType: "address",
+      },
+    ],
+    outputs: [
+      {
+        name: "",
+        type: "bool",
+        internalType: "bool",
+      },
+    ],
+    stateMutability: "view",
+  },
+  {
+    type: "function",
+    name: "startWeekendLottery",
+    inputs: [
+      {
+        name: "durationSeconds",
         type: "uint256",
         internalType: "uint256",
       },
@@ -127,40 +218,8 @@ export const LOTTERY_ABI = [
     stateMutability: "nonpayable",
   },
   {
-    type: "function",
-    name: "ticketPrice",
-    inputs: [],
-    outputs: [
-      {
-        name: "",
-        type: "uint256",
-        internalType: "uint256",
-      },
-    ],
-    stateMutability: "view",
-  },
-  {
     type: "event",
-    name: "LotteryEnded",
-    inputs: [],
-    anonymous: false,
-  },
-  {
-    type: "event",
-    name: "LotteryStarted",
-    inputs: [
-      {
-        name: "ticketPrice",
-        type: "uint256",
-        indexed: false,
-        internalType: "uint256",
-      },
-    ],
-    anonymous: false,
-  },
-  {
-    type: "event",
-    name: "PlayerEntered",
+    name: "LotteryEntered",
     inputs: [
       {
         name: "player",
@@ -169,7 +228,7 @@ export const LOTTERY_ABI = [
         internalType: "address",
       },
       {
-        name: "ticketNumber",
+        name: "lotteryId",
         type: "uint256",
         indexed: false,
         internalType: "uint256",
@@ -179,7 +238,26 @@ export const LOTTERY_ABI = [
   },
   {
     type: "event",
-    name: "WinnerPicked",
+    name: "LotteryStarted",
+    inputs: [
+      {
+        name: "endTime",
+        type: "uint256",
+        indexed: false,
+        internalType: "uint256",
+      },
+      {
+        name: "lotteryId",
+        type: "uint256",
+        indexed: false,
+        internalType: "uint256",
+      },
+    ],
+    anonymous: false,
+  },
+  {
+    type: "event",
+    name: "LotteryWinnerPicked",
     inputs: [
       {
         name: "winner",
@@ -188,7 +266,13 @@ export const LOTTERY_ABI = [
         internalType: "address",
       },
       {
-        name: "amount",
+        name: "prize",
+        type: "uint256",
+        indexed: false,
+        internalType: "uint256",
+      },
+      {
+        name: "lotteryId",
         type: "uint256",
         indexed: false,
         internalType: "uint256",
