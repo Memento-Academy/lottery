@@ -30,7 +30,7 @@ export function Footer() {
               <ExternalLink className="h-3 w-3" />
             </a>
             <a
-              href="https://github.com/CallejaJ/weekend-lottery"
+              href="https://github.com/Memento-Academy/weekend-lottery"
               target="_blank"
               rel="noopener noreferrer"
               className="hover:text-cyan-400 transition-colors flex items-center gap-1"
